@@ -1,0 +1,6 @@
+eq X(i) -- 2 --> . where i in 1..3 
+eq -- 3 --> X(i) . where i in 1..3 
+eq X(i) -- 2 --> X(j) . where i in 3..1 j in 1..3 with i!=j  
+init X(i) = 4000 . where i in 1..1 
+init X(j) = 0 . where j in 2..2 
+init X(k) = 7000 . where k in 3..3 

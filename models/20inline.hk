@@ -1,0 +1,9 @@
+
+eq -- 3 --> X(i) . where i in 1..20
+eq X(i) -- 1 --> . where i in 1..20
+eq X(i) -- 6 --> X(j) . where i in 20..1 j in 1..20 with i==j-1
+eq X(i) -- 6 --> X(j) . where i in 1..20 j in 1..20 with i==j+1
+
+init X(i) = 4000 . where i in 1..5
+init X(i) = 0 . where i in 6..15
+init X(i) = 7000 . where i in 16..20
