@@ -29,7 +29,7 @@ so an automaic generation of mols and eqs should be useful.
 ------------
 ###### CRSL
 Chemnical Reaction Specification Language EBNF:
-* `chem ::= chemeq [inits] [interval] .`
+* `chem ::= chemeq [inits] [interval] [gridspec] [areaspec].`
 * `chemeq ::= "eq" eq chemeqrest .`
 * `chemeqrest ::= [] | "eq" eq chemeqrest.`
 * `eq ::= reagents rate products "." .`
@@ -41,6 +41,8 @@ Chemnical Reaction Specification Language EBNF:
 * `molecule ::= number "*" literal | literal.`
 * `interval ::= "intrerval" number "-->" number ":" number "."`
 * `inits ::= "initval" literal "=" number "." inits | [] .`
+* `areaspec ::= "area" literal "," number "," number "," number "," number "=" number "." areaspec | [].`
+* `gridspec ::= "grid" " number "," number "," number "," number ":" " number "," number "." | []`
 
 ###### HLCeL
 High Level Chemnical Reaction Specification Language EBNF:
