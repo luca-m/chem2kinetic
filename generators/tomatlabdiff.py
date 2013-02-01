@@ -21,18 +21,14 @@ def prepare_eq ( env, mol_reac, mol_prod, reac, prod, rate_list, equation='' ):
 	equation --	string representing the equation
 	"""
 	env.inc_eq_counter()
-	
 	reac_args = list(set(mol_reac + mol_prod)) #Remove repeating elements
-	
 	rate_str = "v_" + str(env.eq_counter) + "("
-	
 	for term in reac_args:
 		rate_str += "Grid(x,y).mols." + str(term) + ", "		
 	rate_str = rate_str[0:-2] + ")"
 	
 	for term in reac:
 		env.reac_dict[env.chem_dict[term[1]]] += "-" + str(term[0]) + "*" + rate_str
-		
 	for term in prod:
 		env.reac_dict[env.chem_dict[term[1]]] += "+" + str(term[0]) + "*" + rate_str
 	
@@ -68,7 +64,7 @@ def prepare_eq ( env, mol_reac, mol_prod, reac, prod, rate_list, equation='' ):
 	
 	env.reac_list.append(v_str)
 
-def generate_source ( env , eqstr, name="KineticSystem" ):
+def generate_source ( env , eqstr, name="diff_system" ):
 	"""
 	Generate kinetic system source code
 	env	--	the environment data srtucture
@@ -76,7 +72,7 @@ def generate_source ( env , eqstr, name="KineticSystem" ):
 	name --		the name of the system (default "KineticSystem")
 	"""
 	if name is None:
-		name="kineticSystem"
+		name="diff_system"
 	"""
 	Generate comment section
 	"""
@@ -93,7 +89,7 @@ def generate_source ( env , eqstr, name="KineticSystem" ):
 	ofstr += "%}\n\n"
 	
 	# Generating Solver Starter
-	ofstr+="function simple_d( nframes )\n"
+	ofstr+="function "+str(name)+"(nframes)\n"
 	ofstr+="	global TimeDiv\n"
 	ofstr+="	global Grid\n"
 	ofstr+="	global GridXmin\n"
@@ -110,7 +106,7 @@ def generate_source ( env , eqstr, name="KineticSystem" ):
 	ofstr+="	setupParams;\n"
 	ofstr+="	Grid=genGrid;\n"
 	ofstr+="	initVal;\n"
-	ofstr+="		figure('visible','off');\n"
+	ofstr+="	figure('visible','off');\n"
 	ofstr+="	tx=linspace(GridXmin,GridXmax,GridXdiv);\n"
 	ofstr+="	ty=linspace(GridYmin,GridYmax,GridYdiv);\n"
 	ofstr+="	stp=max([round(TimeDiv/nframes) 1]);\n"
@@ -122,10 +118,10 @@ def generate_source ( env , eqstr, name="KineticSystem" ):
 		ofstr+="			pgrid=zeros(GridXdiv,GridYdiv);\n"
 		ofstr+="			for y=1:GridXdiv\n"
 		ofstr+="				for x=1:GridYdiv\n"
-		ofstr+="					pgrid(x,y)=grid(x,y).mols."+str(mol)+";\n"
+		ofstr+="					pgrid(x,y)=Grid(x,y).mols."+str(mol)+";\n"
 		ofstr+="				end\n"
 		ofstr+="			end\n"
-		ofstr+="			plot_mesh("+str(name)+","+str(mol)+",t,t*Dt,tx,ty,pgrid);\n"
+		ofstr+="			plot_mesh('"+str(name)+"','"+str(mol)+"',t,t*Dt,tx,ty,pgrid);\n"
 	ofstr+="		end\n"
 	ofstr+="	end\n"
 	ofstr+="end\n"
@@ -195,7 +191,7 @@ def generate_source ( env , eqstr, name="KineticSystem" ):
 	ofstr+="	gy=ceil( (ry-GridYmin)/GridH*GridYdiv );\n"
 	ofstr+="end\n"
 	ofstr+="function plot_mesh(sysname,molname,index,time,tx,ty,tz)\n"
-	ofstr+="	contourf(tx,ty,tz);\n"
+	ofstr+="	contour(tx,ty,tz);\n"
 	ofstr+="	title(strcat(sysname,'-',molname,'- t: ',num2str(time)));\n"
 	ofstr+="	axis square;\n"
 	ofstr+="	colorbar;\n"
@@ -214,8 +210,8 @@ def generate_source ( env , eqstr, name="KineticSystem" ):
 	ofstr+="	global Dy\n"
 	# ugly
 	for (mol,val,x0,y0,x1,y1) in env.rectareas:
-		ofstr+="	for x="+str(x0)+":"+str(Dx)+":"+str(x1)+"\n"
-		ofstr+="		for y="+str(y0)+":"+str(Dy)+":"+str(y1)+"\n"
+		ofstr+="	for x="+str(x0)+":Dx:"+str(x1)+"\n"
+		ofstr+="		for y="+str(y0)+":Dy:"+str(y1)+"\n"
 		ofstr+="			[i,j]=getCell(x,y);\n"
 		ofstr+="			Grid(i,j).mols."+str(mol)+"="+str(val)+";\n"
 		ofstr+="		end\n"

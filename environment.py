@@ -30,7 +30,7 @@ class Environment:
 		self.system_name=None		# Name of the equation system
 		self.diffusion=False		# ?
 		self.gridYmin=0				# 
-		self.griXmin=0				# 
+		self.gridXmin=0				# 
 		self.gridYmax=5				# 
 		self.gridXmax=5				# 
 		self.gridXdiv=20			# 
@@ -42,8 +42,8 @@ class Environment:
 	def add_rectarea(self,molname,value,xorigin,yorigin,xend,yend):
 		""" """
 		tupl=(molname,value,xorigin,yorigin,xend,yend)
-		if xorigin<griXmin or yorigin<griYmin or \ 
-			xend>griXmax or yend>gridYmax:
+		if xorigin<self.gridXmin or yorigin<self.gridYmin or \
+			xend>self.gridXmax or yend>self.gridYmax:
 				abort("area specification outside lattice boundary")
 				return
 		if not tupl in self.rectareas:

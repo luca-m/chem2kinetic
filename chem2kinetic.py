@@ -444,7 +444,7 @@ def parse_gridspec(tokens,i):
 			is_number(tokens[i+5]) and tokens[i+6]==AREASEPARATOR and \
 			is_number(tokens[i+7]) and tokens[i+8]==STEPSEPARATOR and \
 			is_number(tokens[i+9]) and tokens[i+10]==AREASEPARATOR and \
-			is_number(tokens[i+11]) tokens[i+12]==END_LINE:
+			is_number(tokens[i+11]) and tokens[i+12]==END_LINE:
 		env.griXmin=float(tokens[i+1])
 		env.gridYmin=float(tokens[i+3])
 		env.gridXmax=float(tokens[i+5])
@@ -517,7 +517,8 @@ def parse_interval(tokens,i):
 		i+=7
 	else:
 		#env.abort(stack()[0][3]+": missing interval specification. @line:"+str(env.tok_lines[tokens[i-1]]))
-		print "Info: default interval: %f --> %f : %f " % (env.tbegin,env.tend,env.step)
+		if env.verbose:
+			print "Info: default interval: %f --> %f : %f " % (env.tbegin,env.tend,env.step)
 	return i
 def is_number(s):
 	""" """
@@ -585,7 +586,8 @@ def translate(inf,of,sourcegen):
 
 if __name__ == "__main__":
 	
-	generators=insp.list_modules('generators',False,lambda s : not s.startswith('to') and s.endswith('.py'))
+	generators=insp.list_modules('generators',False,lambda s : s.startswith('to') and s.endswith('.py'))
+
 	if len(generators) < 1:
 		print "No generators found in generators folder.. this migh be a problem."
 		exit(-2)
@@ -618,6 +620,7 @@ if __name__ == "__main__":
 	
 	if options.language in generators :
 		sourcegen=insp.import_package(options.language)
+		sourcegen=insp.get_modules(sourcegen).values()[0]
 		# TODO: check if modules respect our interface 
 		#    prepare_eq ( env, mol_reac, mol_prod, reac, prod, rate_list, equation='' )
 		#    generate_source ( env , eqstr, name ):

@@ -48,6 +48,16 @@ def get_members(module_or_clazz_or_object):
 		for k,v in inspect.getmembers(module_or_clazz_or_object):
 			fun[str(k)]=v
 		return fun
+	
+def get_modules(module, filtr=default_object_filter ):
+	"""
+	Obtain all the modules contained by the specified module
+	"""
+	fun=dict()
+	for (k,v) in get_members(module).items():
+		if filtr(k) and inspect.ismodule(v):
+			fun[str(k)]=v
+	return fun
 		
 
 def get_functions(module, filtr=default_object_filter ):
