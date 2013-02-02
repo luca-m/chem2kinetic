@@ -36,8 +36,8 @@ def prepare_eq ( env, mol_reac, mol_prod, reac, prod, rate_list, equation='' ):
 	generate something like
 	%--3-->1*X_3.
 	function res = v_5( X_3 )
-		k5 = 0.3;
-		k5r = 0.3;
+		k5 = 3;
+		k5r = 3;
 		res = k5 - k5r * X_3**1;
 	end
 	"""
@@ -46,8 +46,8 @@ def prepare_eq ( env, mol_reac, mol_prod, reac, prod, rate_list, equation='' ):
 	for term in reac_args:
 		v_str += term + ", "
 	v_str = v_str[0:-2] + " )"
-	v_str += "\n	k" + str(env.eq_counter) + " = "+str(rate_list[0]/10)+";"
-	v_str += "\n	k" + str(env.eq_counter) + "r = "+str(rate_list[0]/10)+";"
+	v_str += "\n	k" + str(env.eq_counter) + " = "+str(rate_list[0])+";"
+	v_str += "\n	k" + str(env.eq_counter) + "r = "+str(rate_list[0])+";"
 	
 	v_str += "\n	res = "
 	v_str += "k" + str(env.eq_counter) + " * "
@@ -191,7 +191,7 @@ def generate_source ( env , eqstr, name="diff_system" ):
 	ofstr+="	gy=ceil( (ry-GridYmin)/GridH*GridYdiv );\n"
 	ofstr+="end\n"
 	ofstr+="function plot_mesh(sysname,molname,index,time,tx,ty,tz)\n"
-	ofstr+="	contour(tx,ty,tz);\n"
+	ofstr+="	contourf(tx,ty,tz);\n"
 	ofstr+="	title(strcat(sysname,'-',molname,'- t: ',num2str(time)));\n"
 	ofstr+="	axis square;\n"
 	ofstr+="	colorbar;\n"

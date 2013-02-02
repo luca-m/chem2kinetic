@@ -35,10 +35,10 @@ class Environment:
 		self.gridXmax=5				# 
 		self.gridXdiv=20			# 
 		self.gridYdiv=20			# 
-		self.diffusionX=1/2			# 
-		self.diffusionY=1/2			# 
+		self.diffusionX=0.1			# 
+		self.diffusionY=0.1			# 
 		self.rectareas=list()		# list of tuples (<MOLNAME>,<VALUE>,<XORIGIN>,<YORIGIN>,<XEND>,<YEND>)
-	
+		self.system_name="chemSystem"	
 	def add_rectarea(self,molname,value,xorigin,yorigin,xend,yend):
 		""" """
 		tupl=(molname,value,xorigin,yorigin,xend,yend)

@@ -37,8 +37,8 @@ DESCRIPTION
 	molecule ::= number "*" literal | literal.
 	interval ::= "intrerval" number "-->" number ":" number "."
 	inits ::= "init" literal "=" number "." inits | [] .
-	areaspec ::= "area" literal "," number "," number "," number "," number "=" number "." areaspec | []. 
-	gridspec ::= "grid" " number "," number "," number "," number ":" " number "," number "." | []
+	areaspec ::= "area" literal ":" number "," number "," number "," number "=" number "." areaspec | []. 
+	gridspec ::= "grid" " number "," number "," number "," number ":" " number "," number "-->" number "," number "." | []
 	
 EXAMPLES
 	
@@ -430,7 +430,7 @@ def parse_inits(tokens,i):
 def parse_gridspec(tokens,i):
 	"""
 	 Parse Grid specification
-	 gridspec ::= "grid" " number "," number "," number "," number ":" " number "," number "." | []
+	 gridspec ::= "grid" " number "," number "," number "," number ":" " number "," number "-->" number "," number "." | []
 	"""
 	if env.verbose:
 		print stack()[0][3]+" with token n."+str(i)+" '"+str(tokens[i])+"'"
@@ -438,20 +438,24 @@ def parse_gridspec(tokens,i):
 		return i
 	elif i>=len(tokens):
 		return len(tokens)
-	elif i<len(tokens)-12 and tokens[i]==GRIDKEYWORD and \
+	elif i<len(tokens)-16 and tokens[i]==GRIDKEYWORD and \
 			is_number(tokens[i+1]) and tokens[i+2]==AREASEPARATOR and \
 			is_number(tokens[i+3]) and tokens[i+4]==AREASEPARATOR and \
 			is_number(tokens[i+5]) and tokens[i+6]==AREASEPARATOR and \
 			is_number(tokens[i+7]) and tokens[i+8]==STEPSEPARATOR and \
 			is_number(tokens[i+9]) and tokens[i+10]==AREASEPARATOR and \
-			is_number(tokens[i+11]) and tokens[i+12]==END_LINE:
+			is_number(tokens[i+11]) and tokens[i+12]==ARROWEND and \
+			is_number(tokens[i+13]) and tokens[i+14]==AREASEPARATOR and \
+			is_number(tokens[i+15]) and tokens[i+16]==END_LINE:
 		env.griXmin=float(tokens[i+1])
 		env.gridYmin=float(tokens[i+3])
 		env.gridXmax=float(tokens[i+5])
 		env.gridYmax=float(tokens[i+7])
 		env.gridXdiv=int(float(tokens[i+9]))
 		env.gridYdiv=int(float(tokens[i+11]))
-		i+=13
+		env.diffusionX=float(tokens[i+13])
+		env.diffusionY=float(tokens[i+15])
+		i+=17
 	else:
 		# Unknown token
 		pass
@@ -459,7 +463,7 @@ def parse_gridspec(tokens,i):
 def parse_areaspec(tokens,i):
 	"""
 	 Parse Area Value specification
-	 areaspec ::="area" literal "," number "," number "," number "," number "=" number "." areaspec | []. 
+	 areaspec ::="area" literal ":" number "," number "," number "," number "=" number "." areaspec | []. 
 	"""
 	if env.verbose:
 		print stack()[0][3]+" with token n."+str(i)+" '"+str(tokens[i])+"'"
@@ -468,7 +472,7 @@ def parse_areaspec(tokens,i):
 	elif i>=len(tokens):
 		return len(tokens)
 	elif i<len(tokens)-12 and tokens[i]==AREAKEYWORD and \
-			is_literal(tokens[i+1]) and tokens[i+2]==AREASEPARATOR and \
+			is_literal(tokens[i+1]) and tokens[i+2]==STEPSEPARATOR and \
 			is_number(tokens[i+3]) and tokens[i+4]==AREASEPARATOR and \
 			is_number(tokens[i+5]) and tokens[i+6]==AREASEPARATOR and \
 			is_number(tokens[i+7]) and tokens[i+8]==AREASEPARATOR and \
