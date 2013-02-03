@@ -109,7 +109,7 @@ AREASEPARATOR=","
 MULTIPLY="*"
 ARROWBEGIN="--"
 ARROWEND="-->"
-NUMBER="\d+\.\d+|\d+"
+NUMBER="[-]*\d+\.\d+|[-]*\d+"
 LITERAL="[A-Z]\\w+|[A-Z]"
 TOKENIZER_REGEX=("("+EQ_KEYWORD+")|("+INIT_KEYWORD+")|"
 				"("+INTERVAL_KEYWORD+")|("+AREAKEYWORD+")|"
@@ -447,7 +447,7 @@ def parse_gridspec(tokens,i):
 			is_number(tokens[i+11]) and tokens[i+12]==ARROWEND and \
 			is_number(tokens[i+13]) and tokens[i+14]==AREASEPARATOR and \
 			is_number(tokens[i+15]) and tokens[i+16]==END_LINE:
-		env.griXmin=float(tokens[i+1])
+		env.gridXmin=float(tokens[i+1])
 		env.gridYmin=float(tokens[i+3])
 		env.gridXmax=float(tokens[i+5])
 		env.gridYmax=float(tokens[i+7])

@@ -47,14 +47,14 @@ def prepare_eq ( env, mol_reac, mol_prod, reac, prod, rate_list, equation='' ):
 	for term in reac:
 		v_str += term[1] + "**" + str(term[0]) +  " * "
 	v_str = v_str[0:-3]
-		
+	"""	
 	v_str += " - k" + str(env.eq_counter) + "r * "
 	for term in prod:
 		v_str += term[1] + "**" + str(term[0]) + " * "
 	v_str = v_str[0:-3]
-
-	v_str += "\nk" + str(env.eq_counter) + " = "+str(rate_list[0]/10)
-	v_str += "\nk" + str(env.eq_counter) + "r = "+str(rate_list[0]/10)
+	"""
+	v_str += "\nk" + str(env.eq_counter) + " = "+str(rate_list[0])
+	v_str += "\nk" + str(env.eq_counter) + "r = "+str(rate_list[0])
 
 	env.reac_list.append(v_str)
 	

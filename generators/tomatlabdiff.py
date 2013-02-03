@@ -38,29 +38,32 @@ def prepare_eq ( env, mol_reac, mol_prod, reac, prod, rate_list, equation='' ):
 	function res = v_5( X_3 )
 		k5 = 3;
 		k5r = 3;
-		res = k5 - k5r * X_3**1;
+		res = k5 - k5r * X_3^1;
 	end
 	"""
+	# Setting up parameters
 	v_str = "%" + equation + "\n"
 	v_str += "function res = v_" + str(env.eq_counter) + "( "
 	for term in reac_args:
 		v_str += term + ", "
 	v_str = v_str[0:-2] + " )"
+	# Setting up rates
 	v_str += "\n	k" + str(env.eq_counter) + " = "+str(rate_list[0])+";"
-	v_str += "\n	k" + str(env.eq_counter) + "r = "+str(rate_list[0])+";"
-	
+	"""v_str += "\n	k" + str(env.eq_counter) + "r = "+str(rate_list[0])+";"
+	"""
+	# Create equation using Law of Mass Action
 	v_str += "\n	res = "
 	v_str += "k" + str(env.eq_counter) + " * "
-	
 	for term in reac:
-		v_str += term[1] + "**" + str(term[0]) +  " * "
+		v_str += term[1] + "^" + str(term[0]) +  " * "
 	v_str = v_str[0:-3]
-		
+	"""
 	v_str += " - k" + str(env.eq_counter) + "r * "
 	for term in prod:
-		v_str += term[1] + "**" + str(term[0]) + " * "
-	v_str = v_str[0:-3]+";"
-	v_str += "\nend"
+		v_str += term[1] + "^" + str(term[0]) + " * "
+	v_str = v_str[0:-3]
+	"""
+	v_str += ";\nend"
 	
 	env.reac_list.append(v_str)
 
@@ -110,12 +113,15 @@ def generate_source ( env , eqstr, name="diff_system" ):
 	ofstr+="	tx=linspace(GridXmin,GridXmax,GridXdiv);\n"
 	ofstr+="	ty=linspace(GridYmin,GridYmax,GridYdiv);\n"
 	ofstr+="	stp=max([round(TimeDiv/nframes) 1]);\n"
-		
+	ofstr+="	opath='"+str(name)+"';\n"
+	ofstr+="        mkdir(opath);\n"
+	for mol in env.chem_dict.keys():
+		ofstr+="	opath='"+str(name)+"/"+str(mol)+"';\n"
+		ofstr+="        mkdir(opath);\n"
+	ofstr+="	pgrid=zeros(GridXdiv,GridYdiv);\n"
 	ofstr+="	for t=0:TimeDiv\n"
-	ofstr+="		stepBoundary(DUx,DUy,Dx,Dy,Dt);\n"
 	ofstr+="		if (mod(t,stp) == 0)\n"
 	for mol in env.chem_dict.keys():
-		ofstr+="			pgrid=zeros(GridXdiv,GridYdiv);\n"
 		ofstr+="			for y=1:GridXdiv\n"
 		ofstr+="				for x=1:GridYdiv\n"
 		ofstr+="					pgrid(x,y)=Grid(x,y).mols."+str(mol)+";\n"
@@ -123,6 +129,7 @@ def generate_source ( env , eqstr, name="diff_system" ):
 		ofstr+="			end\n"
 		ofstr+="			plot_mesh('"+str(name)+"','"+str(mol)+"',t,t*Dt,tx,ty,pgrid);\n"
 	ofstr+="		end\n"
+	ofstr+="		stepBoundary(DUx,DUy,Dx,Dy,Dt);\n"
 	ofstr+="	end\n"
 	ofstr+="end\n"
 	
@@ -146,25 +153,27 @@ def generate_source ( env , eqstr, name="diff_system" ):
 	ofstr+="	global DUx\n"
 	ofstr+="	global DUy\n"
 	ofstr+="	global Dt\n\n"
-	ofstr+="	GridXmin = "+str(float(env.gridXmin))+";\n"
-	ofstr+="	GridYmin = "+str(float(env.gridYmin))+";\n"
-	ofstr+="	GridXmax = "+str(float(env.gridXmax))+";\n"
-	ofstr+="	GridYmax = "+str(float(env.gridYmax))+";\n"
-	ofstr+="	GridXdiv = "+str(float(env.gridXdiv))+";\n"
-	ofstr+="	GridYdiv = "+str(float(env.gridYdiv))+";\n"
+	ofstr+="	fprintf 'Diffusion Parameters:\\n'\n"
+	ofstr+="	GridXmin = "+str(float(env.gridXmin))+"\n"
+	ofstr+="	GridYmin = "+str(float(env.gridYmin))+"\n"
+	ofstr+="	GridXmax = "+str(float(env.gridXmax))+"\n"
+	ofstr+="	GridYmax = "+str(float(env.gridYmax))+"\n"
+	ofstr+="	GridXdiv = "+str(float(env.gridXdiv))+"\n"
+	ofstr+="	GridYdiv = "+str(float(env.gridYdiv))+"\n"
 	ofstr+="	GridW = GridXmax - GridXmin;\n"
 	ofstr+="	GridH = GridYmax - GridYmin;\n"
-	ofstr+="	TimeMin = "+str(float(env.tbegin))+";\n"
-	ofstr+="	TimeMax = "+str(float(env.tend))+";\n"
+	ofstr+="	TimeMin = "+str(float(env.tbegin))+"\n"
+	ofstr+="	TimeMax = "+str(float(env.tend))+"\n"
 	ofstr+="	TimeW=TimeMax-TimeMin;\n"
+	ofstr+="	TimeDiv=ceil(TimeW/"+str(env.step)+");\n"
 	ofstr+="	% Discretization\n"
-	ofstr+="	Dx=GridW/GridXdiv;\n"
-	ofstr+="	Dy=GridH/GridYdiv;\n"
+	ofstr+="	Dx=GridW/GridXdiv\n"
+	ofstr+="	Dy=GridH/GridYdiv\n"
 	ofstr+="	% Diffusion\n"
-	ofstr+="	DUx="+str(float(env.diffusionX))+";\n"
-	ofstr+="	DUy="+str(float(env.diffusionY))+";\n"
-	ofstr+="	Dt= 0.2 *( min(Dx,Dy)^2 / (2*min(DUx,DUy))); %TimeW/TimeDiv;\n"
-	ofstr+="	TimeDiv=ceil(TimeW/Dt);\n"
+	ofstr+="	DUx="+str(float(env.diffusionX))+"\n"
+	ofstr+="	DUy="+str(float(env.diffusionY))+"\n"
+	ofstr+="	Dt="+str(env.step)+"\n" #0.2 *( min(Dx,Dy)^2 / (2*min(DUx,DUy))) %TimeW/TimeDiv;\n"
+	ofstr+="	fprintf '--------------------\\n'\n"
 	ofstr+="end\n\n"
 	
 	# Generating lattice
@@ -195,7 +204,7 @@ def generate_source ( env , eqstr, name="diff_system" ):
 	ofstr+="	title(strcat(sysname,'-',molname,'- t: ',num2str(time)));\n"
 	ofstr+="	axis square;\n"
 	ofstr+="	colorbar;\n"
-	ofstr+="	fname=sprintf(strcat(sysname,'-',molname,'-%04d.jpg'),index);\n"
+	ofstr+="	fname=sprintf(strcat(sysname,'/',molname,'/%04d.jpg'),index);\n"
 	ofstr+="	if ( exist('OCTAVE_VERSION') ~= 0 )\n"
 	ofstr+="		print(fname,'-djpg');\n"
 	ofstr+="	else\n"
@@ -222,7 +231,6 @@ def generate_source ( env , eqstr, name="diff_system" ):
 	ofstr+="function pgrid=stepBoundary(DUx,DUy,Dx,Dy,Dt)\n"
 	ofstr+="	global Grid;\n"
 	ofstr+="	[rows,cols]=size(Grid);\n"
-	ofstr+="	pgrid=zeros(rows,cols);\n"
 	ofstr+="	Dx2=Dx^2;\n"
 	ofstr+="	Dy2=Dy^2;\n"
 	ofstr+="	Dx2Dy2=Dx2*Dy2;\n"
@@ -278,30 +286,7 @@ def generate_source ( env , eqstr, name="diff_system" ):
 		ofstr += term + "\n"
 	
 	if env.csv:
-		#TBD
 		pass
 	if env.graphics:
-		ofstr += "function plot_data(data, maxpoints)\n"
-		ofstr += "\tx=data( :,2:end);\n"
-		ofstr += "	t=data( :,1);\n"
-		ofstr += "	[nsample cols] = size(x);\n"
-		ofstr += "	k=ceil(nsample/maxpoints);\n"
-		ofstr += "	xx=zeros(maxpoints,cols);\n"
-		ofstr += "	j=1;\n"
-		ofstr += "	for i=1:nsample\n"
-		ofstr += "		if (mod(i,k))==0,\n"
-		ofstr += "			xx(j,:)=x(i,:);\n"
-		ofstr += "			j=j+1;\n"
-		ofstr += "		end\n"
-		ofstr += "	end\n"
-		ofstr += "	plotColor = 'yrgbkmc'; \n"
-		ofstr += "	[p ncolors]=size(plotColor);\n"
-		ofstr += "	figure;\n"
-		ofstr += "	hold on;\n"
-		ofstr += "	for i=1:cols\n"
-		ofstr += "		plot( t,x(:,i),strcat('-',plotColor(mod(i,ncolors)+1),';x',int2str(i),';'));\n"
-		ofstr += "	end\n"
-		ofstr += "	figure;\n"
-		ofstr += "	mesh(xx);\n"
-		ofstr += "end\n"
+		pass
 	return ofstr
