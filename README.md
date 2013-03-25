@@ -1,7 +1,7 @@
 Chem2Kinetic
 ============
 This project aims to convert a chemical system expressed with a proper Domain Specific Language (DSL) to a kinetic, 
-rate equation based, system wich could be solved using standard numerical methodes and tools.
+rate equation based, system which could be solved using standard numerical methods and tools.
 
 Author: luca.mella@studio.unibo.it
 
