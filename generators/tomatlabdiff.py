@@ -241,6 +241,7 @@ def generate_source ( env , eqstr, name="diff_system" ):
 	ofstr+="	DtDUxDUy=DtDUx*DtDUy;\n"
 	ofstr+="	DtDUxDUy_Dx2Dy2=DtDUxDUy/Dx2Dy2;\n"
 	ofstr+="	C=(1-4*DtDUxDUy_Dx2Dy2);\n"
+	ofstr+="	grid=genGrid;\n"
 	ofstr+="	for i=1:cols\n"
 	ofstr+="		ip= i+1;\n"
 	ofstr+="		im= i-1;\n"
@@ -269,9 +270,10 @@ def generate_source ( env , eqstr, name="diff_system" ):
 		ofstr+="			else\n"
 		ofstr+="				G_i_jm=0.0;\n"
 		ofstr+="			end\n"
-		ofstr+="			Grid(i,j).mols."+str(mol)+"=Dt*rate_eq_"+str(mol)+"(i,j)+DtDUx_Dx2*G_ip_j+DtDUx_Dx2*G_im_j+DtDUy_Dy2*G_i_jp+DtDUy_Dy2*G_i_jm+Grid(i,j).mols."+str(mol)+"*C;\n"
+		ofstr+="			grid(i,j).mols."+str(mol)+"=Dt*rate_eq_"+str(mol)+"(i,j)+DtDUx_Dx2*G_ip_j+DtDUx_Dx2*G_im_j+DtDUy_Dy2*G_i_jp+DtDUy_Dy2*G_i_jm+Grid(i,j).mols."+str(mol)+"*C;\n"
 	ofstr+="		end\n"
 	ofstr+="	end\n"
+	ofstr+="	Grid=grid;\n"
 	ofstr+="end\n"
 	
 	# Generating rate_equations
